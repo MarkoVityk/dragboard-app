@@ -1,0 +1,103 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: linear-gradient(to right, yellow, purple);
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app {
+  padding: 20px;
+}
+
+.add-button,
+.add-button:focus,
+.add-button:active,
+.add-button span {
+  background-color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 10px 15px;
+  font-size: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  display: inline-block;
+}
+
+.board {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+}
+
+.column {
+  background: white;
+  padding: 15px;
+  border-radius: 15px;
+  min-width: 200px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.column-header h2 {
+  cursor: pointer;
+  margin: 0;
+}
+
+.column-header input {
+  font-size: 16px;
+  width: 100%;
+  padding: 5px;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: red;
+}
+
+.add-task {
+  margin-top: 10px;
+  font-size: 14px;
+  background: #efefef;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  border: none;
+}
+
+.task-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task {
+  background: #eee;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: grab;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task:active {
+  cursor: grabbing;
+}
+
+.drop-zone {
+  height: 10px;
+}
