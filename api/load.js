@@ -11,25 +11,26 @@ export default async function handler(req, res) {
     return res.status(405).send("Method Not Allowed");
   }
 
-  const id = req.query.id;
-  console.log("Loading board with ID:", id);
+  const { id } = req.query;
 
   if (!id) {
     return res.status(400).json({ error: "Missing id parameter" });
+  }
+
+  // Check that id is a 4-digit string
+  if (!/^\d{4}$/.test(id)) {
+    return res.status(400).json({ error: "Invalid ID format" });
   }
 
   const { data, error } = await supabase
     .from("boards")
     .select("data")
     .eq("id", id)
-    .single();
-
-  console.log("Data:", data);
-  console.log("Error:", error);
+    .maybeSingle();
 
   if (error || !data) {
     return res.status(404).json({ error: "Board not found" });
   }
 
-  res.status(200).json(data.data);
+  return res.status(200).json(data.data);
 }
