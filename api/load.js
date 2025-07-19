@@ -1,14 +1,13 @@
 // /api/load.js
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
-    return res.status(405).send("Method Not Allowed");
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 
   const { id } = req.query;
@@ -17,20 +16,20 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing id parameter" });
   }
 
-  // Check that id is a 4-digit string
-  if (!/^\d{4}$/.test(id)) {
-    return res.status(400).json({ error: "Invalid ID format" });
-  }
-
   const { data, error } = await supabase
     .from("boards")
     .select("data")
-    .eq("id", id)
+    .eq("id", id.toString()) // Ensure string match
     .maybeSingle();
 
-  if (error || !data) {
+  if (error) {
+    console.error("Supabase error:", error.message);
+    return res.status(500).json({ error: "Database error" });
+  }
+
+  if (!data) {
     return res.status(404).json({ error: "Board not found" });
   }
 
-  return res.status(200).json(data.data);
+  return res.status(200).json(data.data); // note: data.data because supabase returns { data: { data: ... } }
 }
