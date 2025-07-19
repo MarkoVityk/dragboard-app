@@ -6,7 +6,6 @@ function App() {
   const [columns, setColumns] = useState([]);
   const fileInputRef = useRef(null);
 
-  // Load board from server if URL has ?id=xxxx
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
@@ -15,7 +14,6 @@ function App() {
     }
   }, []);
 
-  // Save board to backend
   const saveBoard = async () => {
     try {
       const res = await fetch("/api/save", {
@@ -34,7 +32,6 @@ function App() {
     }
   };
 
-  // Load board by ID from backend
   const loadBoardById = async (id) => {
     try {
       const res = await fetch(`/api/load?id=${id}`);
@@ -46,7 +43,6 @@ function App() {
     }
   };
 
-  // Load board via prompt + redirect (load button)
   const loadBoard = () => {
     const id = prompt("Enter your 4-digit board ID:");
     if (id && /^\d{4}$/.test(id)) {
@@ -55,8 +51,6 @@ function App() {
       alert("Invalid ID format. Must be 4 digits.");
     }
   };
-
-  // Other state management functions:
 
   const addColumn = () => {
     setColumns([
@@ -135,8 +129,6 @@ function App() {
     setColumns(updated);
   };
 
-  // Export/import functions
-
   const exportData = () => {
     const dataStr = JSON.stringify(columns, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
@@ -191,7 +183,6 @@ function App() {
           style={{ display: "none" }}
           onChange={importData}
         />
-
         <button className="add-button" onClick={saveBoard} style={{ marginLeft: 10 }}>
           Save
         </button>
@@ -233,7 +224,6 @@ function Column({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(name);
-
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [tempTaskName, setTempTaskName] = useState("");
 
