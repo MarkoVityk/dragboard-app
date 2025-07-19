@@ -1,8 +1,10 @@
+// /api/load.js
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -10,6 +12,8 @@ export default async function handler(req, res) {
   }
 
   const id = req.query.id;
+  console.log("Loading board with ID:", id);
+
   if (!id) {
     return res.status(400).json({ error: "Missing id parameter" });
   }
@@ -19,6 +23,9 @@ export default async function handler(req, res) {
     .select("data")
     .eq("id", id)
     .single();
+
+  console.log("Data:", data);
+  console.log("Error:", error);
 
   if (error || !data) {
     return res.status(404).json({ error: "Board not found" });
