@@ -32,16 +32,25 @@ function App() {
     }
   };
 
-  const loadBoardById = async (id) => {
+    const loadBoardById = async (id) => {
     try {
-      const res = await fetch(`/api/load?id=${id}`);
-      if (!res.ok) throw new Error("Board not found");
-      const loadedColumns = await res.json();
-      setColumns(loadedColumns);
+        const res = await fetch(`/api/load?id=${id}`);
+        if (!res.ok) throw new Error("Board not found");
+
+        const json = await res.json();
+        const loadedColumns = json.data;
+
+        if (!Array.isArray(loadedColumns)) {
+        throw new Error("Loaded data is not an array");
+        }
+
+        console.log("Loaded board data:", loadedColumns);
+        setColumns(loadedColumns);
     } catch (e) {
-      alert("Failed to load board: " + e.message);
+        alert("Failed to load board: " + e.message);
     }
-  };
+    };
+
 
   const loadBoard = () => {
     const id = prompt("Enter your 4-digit board ID:");
