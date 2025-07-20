@@ -4,9 +4,6 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-console.log("SUPABASE_URL", process.env.SUPABASE_URL);
-console.log("SUPABASE_ANON_KEY", process.env.SUPABASE_ANON_KEY?.slice(0, 10));
-
 export default async function handler(req, res) {
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method Not Allowed" });
@@ -31,6 +28,8 @@ export default async function handler(req, res) {
     }
 
     if (!data) {
+        console.log("SUPABASE_URL", process.env.SUPABASE_URL);
+        console.log("SUPABASE_ANON_KEY", process.env.SUPABASE_ANON_KEY?.slice(0, 10));
       return res.status(404).json({ error: "Board not found" });
     }
 
