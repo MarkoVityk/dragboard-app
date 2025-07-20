@@ -4,8 +4,8 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-console.log("SUPABASE_URL", process.env.SUPABASE_URL);
-console.log("SUPABASE_ANON_KEY", process.env.SUPABASE_ANON_KEY?.slice(0, 10));
+console.log("SUPABASE_URL", supabaseUrl);
+console.log("SUPABASE_ANON_KEY", supabaseKey?.slice(0, 10));
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       .from("boards")
       .select("data")
       .eq("id", id)
-      .maybeSingle();
+      .maybeSingle(); // ✅ tolerate no results instead of throwing
 
     if (error) {
       console.error("Supabase error:", error);
@@ -33,12 +33,10 @@ export default async function handler(req, res) {
     if (!data) {
       return res.status(404).json({ error: "Board not found" });
     }
-    if (error || !data) {
-        return res.status(404).json({ error: "Board not found" });
-    }
 
+    // ✅ Send back just the board data object
+    res.status(200).json({ data: data.data });
 
-    res.status(200).json(data.data); // <-- important
   } catch (err) {
     console.error("Unexpected error:", err);
     res.status(500).json({ error: "Unexpected server error" });
