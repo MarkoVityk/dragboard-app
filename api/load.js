@@ -19,11 +19,23 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Fetch and log all IDs in the table
+    const { data: allBoards, error: fetchError } = await supabase
+      .from("boards")
+      .select("id");
+
+    if (fetchError) {
+      console.error("Error fetching all IDs:", fetchError);
+    } else {
+      console.log("All board IDs in DB:", allBoards.map(board => board.id));
+    }
+
+    // Fetch the requested board by id
     const { data, error } = await supabase
       .from("boards")
       .select("data")
-      .eq("id",id)
-      .maybeSingle(); // ✅ tolerate no results instead of throwing
+      .eq("id", id)
+      .maybeSingle();
 
     if (error) {
       console.error("Supabase error:", error);
@@ -33,7 +45,8 @@ export default async function handler(req, res) {
     if (!data) {
       return res.status(404).json({ error: "Board not found" });
     }
-    // ✅ Send back just the board data object
+
+    // Send back just the board data object
     res.status(200).json({ data: data.data });
 
   } catch (err) {
