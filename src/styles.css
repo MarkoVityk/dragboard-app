@@ -101,3 +101,42 @@ body {
 .drop-zone {
   height: 10px;
 }
+
+.board {
+  display: flex;
+  overflow-x: auto; /* horizontal scroll if needed */
+  padding-bottom: 10px; /* give some space for scrollbar */
+  scrollbar-width: thin; /* for Firefox */
+}
+
+.board::-webkit-scrollbar {
+  height: 8px; /* horizontal scrollbar height */
+}
+
+.board::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.3);
+  border-radius: 4px;
+}
+
+.column {
+  flex: 0 0 300px; /* fixed width so columns line up nicely */
+  max-height: 80vh; /* or whatever height you want */
+  overflow-y: auto; /* vertical scroll if too many tasks */
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.column::-webkit-scrollbar {
+  width: 8px; /* vertical scrollbar width */
+}
+
+.column::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.3);
+  border-radius: 4px;
+}
+
+.board {
+  max-height: 90vh; /* prevent it from taking full screen height */
+}
