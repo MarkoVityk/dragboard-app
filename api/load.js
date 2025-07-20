@@ -22,9 +22,10 @@ export default async function handler(req, res) {
     const { data, error } = await supabase
       .from("boards")
       .select("data")
-      .eq("id", id)
+      .eq("id",id)
       .maybeSingle(); // ✅ tolerate no results instead of throwing
 
+    res.status(200).json({ data: data.data });
     if (error) {
       console.error("Supabase error:", error);
       return res.status(500).json({ error: "Database error" });
@@ -33,7 +34,6 @@ export default async function handler(req, res) {
     if (!data) {
       return res.status(404).json({ error: "Board not found" });
     }
-
     // ✅ Send back just the board data object
     res.status(200).json({ data: data.data });
 
