@@ -1,3 +1,4 @@
+// pages/api/save.js
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -10,41 +11,35 @@ export default async function handler(req, res) {
   }
 
   try {
-    const board = req.body;
-    if (!board) {
-      return res.status(400).json({ error: "No board data provided" });
+    const { id: providedId, data: boardData } = req.body;
+
+    if (!boardData || !Array.isArray(boardData)) {
+      return res.status(400).json({ error: "Invalid board data" });
     }
 
-    let id;
-    let tries = 0;
+    let id = providedId;
 
-    while (tries < 5) {
-      id = Math.floor(1000 + Math.random() * 9000).toString();
-      const { data, error } = await supabase
-        .from("boards")
-        .select("id")
-        .eq("id", id)
-        .single();
-
-      if (error) {
-        console.error("Supabase select error:", error);
+    if (!id) {
+      // Generate 4-digit ID
+      let tries = 0;
+      while (tries < 5) {
+        id = Math.floor(1000 + Math.random() * 9000).toString();
+        const { data } = await supabase.from("boards").select("id").eq("id", id).single();
+        if (!data) break;
+        tries++;
       }
-
-      if (!data) break;
-      tries++;
+      if (tries === 5) {
+        return res.status(500).json({ error: "Failed to generate unique ID" });
+      }
     }
 
-    if (tries === 5) {
-      return res.status(500).json({ error: "Failed to generate unique ID" });
-    }
-
-    const { error: insertError } = await supabase
+    const { error: upsertError } = await supabase
       .from("boards")
-      .insert([{ id, data: board }]);
+      .upsert([{ id, data: boardData }]);
 
-    if (insertError) {
-      console.error("Supabase insert error:", insertError);
-      return res.status(500).json({ error: insertError.message });
+    if (upsertError) {
+      console.error("Supabase upsert error:", upsertError);
+      return res.status(500).json({ error: upsertError.message });
     }
 
     res.status(200).json({ id });

@@ -14,23 +14,32 @@ function App() {
     }
   }, []);
 
-  const saveBoard = async () => {
+    const saveBoard = async () => {
     try {
-      const res = await fetch("/api/save", {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+
+        const res = await fetch("/api/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(columns),
-      });
-      if (!res.ok) throw new Error("Save failed");
-      const data = await res.json();
-      const id = data.id;
-      const url = window.location.origin + window.location.pathname + "?id=" + id;
-      alert(`Board saved!\nYour URL: ${url}\nYour ID: ${id}`);
-      window.history.pushState(null, "", "?id=" + id);
+        body: JSON.stringify({
+            id,          // pass existing id if available
+            data: columns, // your Kanban board data
+        }),
+        });
+
+        if (!res.ok) throw new Error("Save failed");
+
+        const data = await res.json();
+        const newId = data.id;
+        const url = `${window.location.origin}${window.location.pathname}?id=${newId}`;
+        alert(`Board saved!\nYour URL: ${url}\nYour ID: ${newId}`);
+        window.history.pushState(null, "", "?id=" + newId);
     } catch (e) {
-      alert("Failed to save board: " + e.message);
+        alert("Failed to save board: " + e.message);
     }
-  };
+    };
+
 
     const loadBoardById = async (id) => {
     try {
