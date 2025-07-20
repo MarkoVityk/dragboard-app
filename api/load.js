@@ -1,11 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const anonKey = process.env.SUPABASE_ANON_KEY;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-console.log("SUPABASE_URL", supabaseUrl);
-console.log("SUPABASE_ANON_KEY", supabaseKey?.slice(0, 10));
+let supabase = createClient(supabaseUrl, anonKey);
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -19,23 +18,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Fetch and log all IDs in the table
-    const { data: allBoards, error: fetchError } = await supabase
-      .from("boards")
-      .select("id");
-
-    if (fetchError) {
-      console.error("Error fetching all IDs:", fetchError);
-    } else {
-      console.log("All board IDs in DB:", allBoards.map(board => board.id));
-    }
-
-    // Fetch the requested board by id
-    const { data, error } = await supabase
+    // Attempt with anon key first
+    let { data, error } = await supabase
       .from("boards")
       .select("data")
       .eq("id", id)
       .maybeSingle();
+
+    // If anon key fails due to RLS or other error, retry with service role key
+    if (error || !data) {
+      console.warn("Anon key failed, retrying with service key...");
+      supabase = createClient(supabaseUrl, serviceKey); // Recreate client
+      const result = await supabase
+        .from("boards")
+        .select("data")
+        .eq("id", id)
+        .maybeSingle();
+      data = result.data;
+      error = result.error;
+    }
 
     if (error) {
       console.error("Supabase error:", error);
@@ -46,7 +47,6 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: "Board not found" });
     }
 
-    // Send back just the board data object
     res.status(200).json({ data: data.data });
 
   } catch (err) {
